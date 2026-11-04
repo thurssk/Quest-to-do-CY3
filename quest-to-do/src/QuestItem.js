@@ -14,29 +14,36 @@ export default function QuestItem({ props }) {
                     type="checkbox"
                     checked={checked}
                     classname="checkbox rounded-full border"
+                    onchange={(e) => {
+                        if (concluded) return;
+                        else {
+                            setChecked(!checked);
+                            props.saveConcluded(props.quest);
+                        }
+                    }}
                 />
-                <p className="break-words">
-                    {props.quest.title}
-                </p>
+                {editMode && !concluded ? (
+                    <input
+                        placeholder="quest"
+                        defaultValue={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        className="rounded-full bg-secondary pl-2 w-full input-sm flex focus:outline-none"
+                    />
+                ) : (
+                    <p className={`break-words ${concluded ? "line-through" : ""}`}>
+                        {props.quest.title}
+                    </p>
+                )}
             </div>
 
-            {editmode && !conclued ? (
-                <input
-                 placeholder="quest"
-                 defaultvalue={title}
-                 onchange={(e) => setTitle(e.target.value)}
-                classname="rounded-full bg-secundary pl-2 w-full input-sm flex focus:outline-none"
-                />
-            ) : (
-                <p classname={`break-words ${concluded ? "line-through" : ""}`}>
-                    {props.quest.title}
-                </p>
+          
+            {!concluded && (
+                <div classname="flex gap-4 w-full sm:w-fit justify-center">
+                    <button onClick={() => {  if (editmode) props.saveEditQuest(props.quest, title); setEditMode(!editMode);
+                     }}>Editar</button>
+                    <button>Excluir</button>
+                </div>
             )}
-
-            <div classname="flex gap-4 w-full sm:w-fit justify-center">
-                <button onClick={() => setEditMode(!editmode)}>Editar</button>
-                <button>Excluir</button>
-            </div>
         </div>
     )
 }

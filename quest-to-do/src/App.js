@@ -3,8 +3,41 @@ import { useState } from "react";
 import QuestList from "./QuestList";
 
 function App() {
-  const LocalQuests = JSON.parse(window.localStorage.getItem("quests")) || [];
-  const [quests, setQuests] = useState(LocalQuests);
+  const [quests, setQuests] = useState([]);
+
+  function saveEditQuest(quest, title) {
+    let auxQuests = quests;
+    const editedQuest = {
+      id: quest.id,
+      title: title,
+      status: quest.status,
+      created_at: quest.created_at,
+    };
+
+    const findquestposition = auxQuests.findIndex((quest) => quest.id === editedQuest.id);
+
+    auxQuests.splice(findquestposition, 1, editedQuest);
+
+    localStorage.setItem("quests", JSON.stringify(auxQuests));
+    getQuests();
+  }
+    
+  function saveConcludedQuest(quest) {
+    let auxQuests = quests;
+    const concludedQuest = {
+      id: quest.id,
+      title: quest.title,
+      status: "concluido",
+      created_at: quest.created_at,
+    }
+
+    const findquestposition = auxQuests.findIndex((quest) => quest.id === concludedQuest.id);
+
+    auxQuests.splice(findquestposition, 1, concludedQuest);
+
+    localStorage.setItem("quests", JSON.stringify(auxQuests));
+    getQuests();
+  }
 
   function saveAddQuest(title) { 
     let auxQuests = quests;
@@ -29,13 +62,23 @@ function App() {
     setQuests(JSON.parse(window.localStorage.getItem("quests"))); 
   }
 
+  const concludedQuests = quests.filter((quest) => quest.status === "concluido");
+
+  const openQuests = quests.filter((quest) => quest.status === "aberto");
+
+  //console.log(concludedQuests, notConcludedQuests);
+
   return (
     <div className="flex h-screen justify-center items-center">
       <div className="card w-[80%] lg:w-[50%] h-[70%] shadow-md rounded-sm transform ease-out duration-300 items-center p-10 gap-5">
         <h1 className="text-5xl font-work font-bold w-fit text-center">Quest To Do</h1>
         <AddQuest saveAddQuest={saveAddQuest}/>
-        <QuestList quests={quests}/>
+        
+        <div className="flex flex-col gap-4 w-full items-center">
+          <h2>Concluidas</h2>
+          <QuestList quests={concludedQuests} saveEditQuest={saveEditQuest} saveConcludedQuest={saveConcludedQuest} />
         </div>
+      </div>
     </div>
   )
 }
